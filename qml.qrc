@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>Game.qml</file>
+        <file>PhysicsItem.qml</file>
+        <file>Car.qml</file>
+    </qresource>
+</RCC>
