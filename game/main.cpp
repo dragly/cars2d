@@ -1,12 +1,16 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include <QDebug>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    qDebug() << QDir::currentPath();
+
     QQmlApplicationEngine engine;
-    engine.addImportPath("/home/svenni/apps/qt/box2d/qml-box2d");
+    engine.addImportPath("../qml-box2d");
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
