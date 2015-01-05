@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     qDebug() << QDir::currentPath();
 
     QQmlApplicationEngine engine;
-    engine.addImportPath("../qml-box2d");
+    engine.addImportPath("/home/svenni/apps/qt/qml-box2d/build-box2d-Desktop_Qt_5_4_0_GCC_64bit-Release");
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();

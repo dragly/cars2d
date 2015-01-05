@@ -7,9 +7,9 @@ Item {
 
     property var tires: [frontLeftTire, frontRightTire, backLeftTire, backRightTire]
     property var controllableTires: [frontLeftTire, frontRightTire]
-    //        property var forceTires: [backLeftTire, backRightTire]
-            property var forceTires: [frontLeftTire, frontRightTire]
-//    property var forceTires: [frontLeftTire, frontRightTire, backLeftTire, backRightTire]
+    //            property var forceTires: [backLeftTire, backRightTire]
+    property var forceTires: [frontLeftTire, frontRightTire]
+    //    property var forceTires: [frontLeftTire, frontRightTire, backLeftTire, backRightTire]
 
     property bool forward: false
     property bool backward: false
@@ -21,6 +21,8 @@ Item {
     property var path: [
         Qt.vector2d(100,100),
         Qt.vector2d(100,1000),
+//        Qt.vector2d(800,200),
+//        Qt.vector2d(200,200),
         Qt.vector2d(1000,1000),
         Qt.vector2d(1000,100)
     ]
@@ -30,8 +32,8 @@ Item {
 
     property alias hull: hull
 
-//    property point lineStart
-//    property point lineEnd
+    //    property point lineStart
+    //    property point lineEnd
 
     function wrappedPathIndex(index) {
         var result = index
@@ -65,13 +67,14 @@ Item {
         for(var i in tires) {
             var tire = tires[i]
 
-            var x = Math.cos(tire.rotation*Math.PI/180 + Math.PI / 2)
-            var y = Math.sin(tire.rotation*Math.PI/180 + Math.PI / 2)
-            var currentRightNormal = Qt.vector2d(x, y)
+            var x = Math.cos(tire.rotation*Math.PI/180)
+            var y = Math.sin(tire.rotation*Math.PI/180)
+            var rightNormal = Qt.vector2d(-y, x)
+            var forwardNormal = Qt.vector2d(x, y)
             var linearVelocity = Qt.vector2d(tire.linearVelocity.x, tire.linearVelocity.y)
             var linearVelocityMagnitude = linearVelocity.length()
-            var dot = currentRightNormal.dotProduct(linearVelocity)
-            var lateralVelocity = currentRightNormal.times(dot)
+            var lateralVelocity = rightNormal.times(rightNormal.dotProduct(linearVelocity))
+            var parallelSpeed = forwardNormal.dotProduct(linearVelocity)
 
             var impulseFactor = 1.0 * (tire.body.getMass() + hull.body.getMass() / 64)
             if(linearVelocityMagnitude > 20) {
@@ -81,15 +84,25 @@ Item {
             impulse = Qt.point(impulse.x, impulse.y)
             var tireCenter = Qt.point(tire.width / 2, tire.height / 2)
             tire.body.applyLinearImpulse(impulse, tire.body.toWorldPoint(tireCenter))
-            //            tire.body.applyForceToCenter(impulse)
+
+            // Braking ?
+            if((parallelSpeed > 0 && backward) || (parallelSpeed < 0 && forward)) {
+                var x = Math.cos(tire.rotation*Math.PI/180) * 20 * tire.body.getMass()
+                var y = Math.sin(tire.rotation*Math.PI/180) * 20 * tire.body.getMass()
+                if(backward) {
+                    x *= -1
+                    y *= -1
+                }
+                tire.body.applyLinearImpulse(Qt.point(x, y), tire.body.toWorldPoint(tireCenter))
+            }
         }
         for(var i in forceTires) {
             var tire = forceTires[i]
             var linearVelocity = Qt.vector2d(tire.linearVelocity.x, tire.linearVelocity.y)
             var linearVelocityMagnitude = linearVelocity.length()
-//            if(linearVelocityMagnitude > 10 && autopilot) {
-//                continue
-//            }
+            //            if(linearVelocityMagnitude > 10 && autopilot) {
+            //                continue
+            //            }
             if(forward || backward) {
                 var x = Math.cos(tire.rotation*Math.PI/180) * 5 * tire.body.getMass()
                 var y = Math.sin(tire.rotation*Math.PI/180) * 5 * tire.body.getMass()
@@ -189,33 +202,140 @@ Item {
 
     PhysicsItem {
         id: hull
+
         width: 100
         height: 50
 
         bodyType: Body.Dynamic
 
-        fixtures: Box {
-            width: hull.width
-            height: hull.height
-            density: 50
-        }
+        fixtures: [
+            Box {
+                width: hull.width
+                height: hull.height
+                density: 50
+                restitution: 0.7
+                friction: 1
+                categories: Box.Category2
+            },
+            Box {
+                id: frontCollider
+
+                property int collisionCount: 0
+                collidesWith: Box.Category2
+                x: hull.width * 1
+                y: hull.height / 2 - height / 2
+                sensor: true
+                //                width: collider.width
+                //                height: collider.height
+                width: hull.width
+                height: hull.height * 1.5
+
+                onCollisionCountChanged: {
+                    if(autopilot) {
+                        if(collisionCount > 0) {
+                            forward = false
+                            backward = true
+                        } else {
+                            forward = true
+                            backward = false
+                        }
+                    }
+                }
+
+                onBeginContact: {
+                    collisionCount += 1
+                }
+                onEndContact: {
+                    collisionCount -= 1
+                }
+            },
+            Box {
+                id: backCollider
+
+                property int collisionCount: 0
+//                collidesWith: Box.Category2
+                x: -hull.width * 0.5
+                y: hull.height / 2 - height / 2
+                sensor: true
+                //                width: collider.width
+                //                height: collider.height
+                width: hull.width
+                height: hull.height * 1.5
+
+                onCollisionCountChanged: {
+//                    if(autopilot) {
+//                        if(collisionCount > 0) {
+//                            forward = true
+//                            backward = false
+//                        } else {
+//                            forward = false
+//                            backward = true
+//                        }
+//                    }
+                }
+
+                onBeginContact: {
+                    collisionCount += 1
+                }
+                onEndContact: {
+                    collisionCount -= 1
+                }
+            }
+        ]
+
+//        Rectangle {
+//            x: frontCollider.x
+//            y: frontCollider.y
+//            width: frontCollider.width
+//            height: frontCollider.height
+//            color: "orange"
+//        }
+
+//        Rectangle {
+//            x: backCollider.x
+//            y: backCollider.y
+//            width: backCollider.width
+//            height: backCollider.height
+//            color: "yellow"
+//        }
 
         Rectangle {
             anchors.fill: parent
-            color: "blue"
+            color: forward ? "blue" : "green"
             smooth: true
             antialiasing: true
         }
 
-//        Rectangle {
-//            anchors.centerIn: parent
-//            radius: 200
-//            width: 400
-//            height: width
-//            color: "#AA0000AA"
-//            z: -999999
-//        }
+        //        Rectangle {
+        //            anchors.centerIn: parent
+        //            radius: 200
+        //            width: 400
+        //            height: width
+        //            color: "#AA0000AA"
+        //            z: -999999
+        //        }
     }
+
+    //    PhysicsItem {
+    //        id: collider
+    //        width: 100
+    //        height: 100
+    //        bodyType: Body.Dynamic
+    //        fixtures:
+    //        Rectangle {
+    //            anchors.fill: parent
+    //            color: "red"
+    //        }
+    //    }
+
+    //    RevoluteJoint {
+    //        id: colliderJoint
+    //        bodyA: hull.body
+    //        bodyB: collider.body
+    //        localAnchorA: Qt.point(hull.width + 10,  hull.height / 2 - collider.height / 2)
+    //        localAnchorB: Qt.point(0, collider.height / 2)
+    ////        enableLimit: true
+    //    }
 
     RevoluteJoint {
         id: frontLeftJoint

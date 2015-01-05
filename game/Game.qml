@@ -6,6 +6,14 @@ Rectangle {
     width: 10000
     height: 10000
 
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            var component = Qt.createComponent("Box.qml")
+            var box = component.createObject(root, {x: mouse.x - 16, y: mouse.y - 16})
+        }
+    }
+
     World {
         id: physicsWorld
         gravity: Qt.point(0, 0)
@@ -14,10 +22,10 @@ Rectangle {
             car2.stepped()
             car3.stepped()
             car4.stepped()
-            car5.stepped()
-            car6.stepped()
-            car7.stepped()
-            car8.stepped()
+//            car5.stepped()
+//            car6.stepped()
+//            car7.stepped()
+//            car8.stepped()
         }
     }
 
@@ -54,37 +62,37 @@ Rectangle {
         hull.y: 100
     }
 
-    Car {
-        id: car5
-        focus: false
-        forward: true
-        hull.x: 500
-        hull.y: 100
-    }
+//    Car {
+//        id: car5
+//        focus: false
+//        forward: true
+//        hull.x: 500
+//        hull.y: 100
+//    }
 
-    Car {
-        id: car6
-        focus: false
-        forward: true
-        hull.x: 100
-        hull.y: 300
-    }
+//    Car {
+//        id: car6
+//        focus: false
+//        forward: true
+//        hull.x: 100
+//        hull.y: 300
+//    }
 
-    Car {
-        id: car7
-        focus: false
-        forward: true
-        hull.x: 300
-        hull.y: 300
-    }
+//    Car {
+//        id: car7
+//        focus: false
+//        forward: true
+//        hull.x: 300
+//        hull.y: 300
+//    }
 
-    Car {
-        id: car8
-        focus: false
-        forward: true
-        hull.x: 500
-        hull.y: 300
-    }
+//    Car {
+//        id: car8
+//        focus: false
+//        forward: true
+//        hull.x: 500
+//        hull.y: 300
+//    }
 
     Rectangle {
         id: button

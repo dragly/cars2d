@@ -5,5 +5,6 @@
         <file>Game.qml</file>
         <file>PhysicsItem.qml</file>
         <file>Car.qml</file>
+        <file>Box.qml</file>
     </qresource>
 </RCC>
