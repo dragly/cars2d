@@ -76,13 +76,13 @@ Item {
             var lateralVelocity = rightNormal.times(rightNormal.dotProduct(linearVelocity))
             var parallelSpeed = forwardNormal.dotProduct(linearVelocity)
 
-            var impulseFactor = 1.0 * (tire.body.getMass() + hull.body.getMass() / 64)
+            var impulseFactor = 0.3 * (tire.body.getMass() + hull.body.getMass() / 64)
             if(linearVelocityMagnitude > 20) {
                 impulseFactor /= 0.05 * linearVelocityMagnitude
             }
             var impulse = lateralVelocity.times(-impulseFactor)
-            impulse = Qt.point(impulse.x, impulse.y)
-            var tireCenter = Qt.point(tire.width / 2, tire.height / 2)
+//            impulse = Qt.vector2d(impulse.x, impulse.y)
+            var tireCenter = Qt.vector2d(tire.width / 2, tire.height / 2)
             tire.body.applyLinearImpulse(impulse, tire.body.toWorldPoint(tireCenter))
 
             // Braking ?
@@ -93,7 +93,7 @@ Item {
                     x *= -1
                     y *= -1
                 }
-                tire.body.applyLinearImpulse(Qt.point(x, y), tire.body.toWorldPoint(tireCenter))
+                tire.body.applyLinearImpulse(Qt.vector2d(x, y), tire.body.toWorldPoint(tireCenter))
             }
         }
         for(var i in forceTires) {
@@ -111,7 +111,7 @@ Item {
                     y *= -1
                 }
 
-                tire.body.applyLinearImpulse(Qt.point(x, y), tire.body.toWorldPoint(tireCenter))
+                tire.body.applyLinearImpulse(Qt.vector2d(x, y), tire.body.toWorldPoint(tireCenter))
             }
         }
 
@@ -133,8 +133,8 @@ Item {
             frontRightJoint.setLimits(newAngle, newAngle)
         }
 
-        var x0 = hull.body.toWorldPoint(Qt.point(hull.width / 2, hull.height / 2)).x
-        var y0 = hull.body.toWorldPoint(Qt.point(hull.width / 2, hull.height / 2)).y
+        var x0 = hull.body.toWorldPoint(Qt.vector2d(hull.width / 2, hull.height / 2)).x
+        var y0 = hull.body.toWorldPoint(Qt.vector2d(hull.width / 2, hull.height / 2)).y
 
         var x1 = lineStart.x - x0
         var y1 = lineStart.y - y0
@@ -332,8 +332,8 @@ Item {
     //        id: colliderJoint
     //        bodyA: hull.body
     //        bodyB: collider.body
-    //        localAnchorA: Qt.point(hull.width + 10,  hull.height / 2 - collider.height / 2)
-    //        localAnchorB: Qt.point(0, collider.height / 2)
+    //        localAnchorA: Qt.vector2d(hull.width + 10,  hull.height / 2 - collider.height / 2)
+    //        localAnchorB: Qt.vector2d(0, collider.height / 2)
     ////        enableLimit: true
     //    }
 
@@ -341,8 +341,8 @@ Item {
         id: frontLeftJoint
         bodyA: hull.body
         bodyB: frontLeftTire.body
-        localAnchorA: Qt.point(hull.width - frontLeftTire.width,  frontLeftTire.height / 2)
-        localAnchorB: Qt.point(frontLeftTire.width / 2, frontLeftTire.height / 2)
+        localAnchorA: Qt.vector2d(hull.width - frontLeftTire.width,  frontLeftTire.height / 2)
+        localAnchorB: Qt.vector2d(frontLeftTire.width / 2, frontLeftTire.height / 2)
         enableLimit: true
     }
 
@@ -350,24 +350,24 @@ Item {
         id: frontRightJoint
         bodyA: hull.body
         bodyB: frontRightTire.body
-        localAnchorA: Qt.point(hull.width - frontLeftTire.width, hull.height - frontLeftTire.height / 2)
-        localAnchorB: Qt.point(frontRightTire.width / 2, frontRightTire.height / 2)
+        localAnchorA: Qt.vector2d(hull.width - frontLeftTire.width, hull.height - frontLeftTire.height / 2)
+        localAnchorB: Qt.vector2d(frontRightTire.width / 2, frontRightTire.height / 2)
         enableLimit: true
     }
 
     RevoluteJoint {
         bodyA: hull.body
         bodyB: backLeftTire.body
-        localAnchorA: Qt.point(frontLeftTire.width, frontLeftTire.height / 2)
-        localAnchorB: Qt.point(backLeftTire.width / 2, backLeftTire.height / 2)
+        localAnchorA: Qt.vector2d(frontLeftTire.width, frontLeftTire.height / 2)
+        localAnchorB: Qt.vector2d(backLeftTire.width / 2, backLeftTire.height / 2)
         enableLimit: true
     }
 
     RevoluteJoint {
         bodyA: hull.body
         bodyB: backRightTire.body
-        localAnchorA: Qt.point(frontLeftTire.width, hull.height - frontLeftTire.height / 2)
-        localAnchorB: Qt.point(backRightTire.width / 2, backRightTire.height / 2)
+        localAnchorA: Qt.vector2d(frontLeftTire.width, hull.height - frontLeftTire.height / 2)
+        localAnchorB: Qt.vector2d(backRightTire.width / 2, backRightTire.height / 2)
         enableLimit: true
     }
 
