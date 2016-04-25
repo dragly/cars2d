@@ -3,8 +3,15 @@ import Box2D 2.0
 
 Rectangle {
     id: root
-    width: 10000
-    height: 10000
+
+    x: -car.hull.x + width / 2
+    y: -car.hull.y + height / 2
+
+//    width: 10000
+//    height: 10000
+
+    width: parent.width
+    height: parent.height
 
     MouseArea {
         anchors.fill: parent

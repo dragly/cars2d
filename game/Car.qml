@@ -76,9 +76,9 @@ Item {
             var lateralVelocity = rightNormal.times(rightNormal.dotProduct(linearVelocity))
             var parallelSpeed = forwardNormal.dotProduct(linearVelocity)
 
-            var impulseFactor = 0.3 * (tire.body.getMass() + hull.body.getMass() / 64)
-            if(linearVelocityMagnitude > 20) {
-                impulseFactor /= 0.05 * linearVelocityMagnitude
+            var impulseFactor = 20.0 * (tire.body.getMass() + hull.body.getMass() / 64)
+            if(linearVelocityMagnitude > 1.0) {
+                impulseFactor /= 1.0*linearVelocityMagnitude
             }
             var impulse = lateralVelocity.times(-impulseFactor)
 //            impulse = Qt.vector2d(impulse.x, impulse.y)
@@ -118,7 +118,12 @@ Item {
         for(var i in controllableTires) {
             var tire = controllableTires[i]
             var DEGTORAD = 1.0
-            var lockAngle = 25 * DEGTORAD
+            var lockAngle = 25 * DEGTORAD;
+            var kickin = 10.0;
+            if(linearVelocityMagnitude > kickin) {
+                lockAngle *= kickin / linearVelocityMagnitude;
+            }
+
             var lowerLockAngle = -lockAngle
             var upperLockAngle = lockAngle
             var turnSpeedPerSec = 120 * DEGTORAD;

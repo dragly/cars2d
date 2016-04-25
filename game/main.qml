@@ -9,14 +9,12 @@ ApplicationWindow {
     height: 1200
     visible: true
 
-    Flickable {
-        anchors.fill: parent
-        boundsBehavior: Flickable.DragOverBounds
-        contentHeight: 10000
-        contentWidth: 10000
-
+//    Flickable {
+//        anchors.fill: parent
+//        boundsBehavior: Flickable.DragOverBounds
+//        contentHeight: 10000
+//        contentWidth: 10000
         Game {
-
         }
-    }
+//    }
 }
